@@ -1,0 +1,165 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum AiProvider {
+  OPENAI
+  GOOGLE_AI
+  ANTHROPIC
+}
+
+enum Platform {
+  YOUTUBE
+  WHATSAPP
+  TELEGRAM
+  PINTEREST
+  REDDIT
+  THREADS
+  TWITTER
+  LINKEDIN
+  INSTAGRAM
+  DEVTO
+  DISCORD
+}
+
+enum ConnectionStatus {
+  ACTIVE
+  EXPIRED
+  ERROR
+}
+
+enum CampaignStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  PARTIALLY_FAILED
+  FAILED
+}
+
+enum PublishStatus {
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+model Workspace {
+  id               String               @id @default(cuid())
+  name             String
+  slug             String               @unique
+  stripeCustomerId String?
+  plan             Plan                 @default(FREE)
+  websiteUrl       String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  apiKeys          WorkspaceApiKey[]
+  connections      ChannelConnection[]
+  workflows        Workflow[]
+  campaignRuns     CampaignRun[]
+
+  @@index([slug])
+}
+
+model WorkspaceApiKey {
+  id           String      @id @default(cuid())
+  workspaceId  String
+  provider     AiProvider
+  encryptedKey String
+  iv           String
+  tag          String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  workspace    Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, provider])
+  @@index([workspaceId])
+}
+
+model ChannelConnection {
+  id                   String           @id @default(cuid())
+  workspaceId          String
+  platform             Platform
+  accountName          String
+  encryptedAccessToken String
+  encryptedRefreshToken String?
+  tokenExpiresAt       DateTime?
+  metadata             Json             @default("{}")
+  iv                   String
+  tag                  String
+  status               ConnectionStatus @default(ACTIVE)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  workspace            Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, platform, accountName])
+  @@index([workspaceId, platform])
+}
+
+model Workflow {
+  id             String        @id @default(cuid())
+  workspaceId    String
+  name           String
+  nodes          Json          // React Flow DAG nodes
+  edges          Json          // React Flow DAG connections
+  cronExpression String        @default("0 8 * * *")
+  timezone       String        @default("UTC")
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  workspace      Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  campaignRuns   CampaignRun[]
+
+  @@index([workspaceId, isActive])
+}
+
+model CampaignRun {
+  id               String         @id @default(cuid())
+  workspaceId      String
+  workflowId       String?
+  status           CampaignStatus @default(QUEUED)
+  seedTopic        String
+  targetUrl        String
+  canonicalPayload Json           // Contains all 11 platform-specific generated variants
+  mediaUrls        String[]       @default([])
+  idempotencyKey   String         @unique // workspaceId:date:hash
+  createdAt        DateTime       @default(now())
+  completedAt      DateTime?
+
+  workspace        Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workflow         Workflow?      @relation(fields: [workflowId], references: [id], onDelete: SetNull)
+  publishLogs      PublishLog[]
+
+  @@index([workspaceId, createdAt])
+  @@index([idempotencyKey])
+}
+
+model PublishLog {
+  id            String        @id @default(cuid())
+  campaignRunId String
+  channel       Platform
+  status        PublishStatus
+  attempts      Int           @default(1)
+  externalPostId String?
+  externalUrl   String?
+  errorResponse String?
+  executedAt    DateTime      @default(now())
+
+  campaignRun   CampaignRun   @relation(fields: [campaignRunId], references: [id], onDelete: Cascade)
+
+  @@index([campaignRunId, channel])
+}
