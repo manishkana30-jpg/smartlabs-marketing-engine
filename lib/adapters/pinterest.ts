@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { PinterestContent } from "../ai/types";
 
@@ -73,3 +73,4 @@ export const pinterestAdapter: ChannelAdapter<PinterestContent> = {
     }
   },
 };
+

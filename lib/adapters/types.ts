@@ -1,4 +1,5 @@
-import { Platform, ChannelConnection } from "@prisma/client";
+import { ChannelConnection } from "@prisma/client";
+import { Platform } from "../types";
 
 export interface PublishResult {
   success: boolean;
@@ -22,3 +23,4 @@ export interface ChannelAdapter<TContent> {
     mediaUrls?: string[]
   ): Promise<PublishResult>;
 }
+

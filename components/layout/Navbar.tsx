@@ -6,25 +6,25 @@ import { usePathname } from "next/navigation";
 import {
   Sparkles,
   GitFork,
-  Radio,
   Sliders,
-  TrendingUp,
+  History,
+  Zap,
 } from "lucide-react";
 
 function NavLinks() {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/", label: "Overview", icon: <TrendingUp className="h-4 w-4" /> },
-    { href: "/workflows", label: "Visual DAG Studio", icon: <GitFork className="h-4 w-4" /> },
-    { href: "/campaigns/new", label: "Single-Source Synthesizer", icon: <Sparkles className="h-4 w-4" /> },
-    { href: "/settings/channels", label: "Channels & BYOK", icon: <Sliders className="h-4 w-4" /> },
+    { href: "/studio", label: "Studio", icon: <Sparkles className="h-4 w-4" /> },
+    { href: "/workflows", label: "Visual Workflows", icon: <GitFork className="h-4 w-4" /> },
+    { href: "/history", label: "Campaign History", icon: <History className="h-4 w-4" /> },
+    { href: "/settings", label: "Settings", icon: <Sliders className="h-4 w-4" /> },
   ];
 
   return (
     <nav className="flex items-center gap-1">
       {navItems.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = pathname === item.href || (item.href === "/studio" && pathname === "/");
         return (
           <Link
             key={item.href}
@@ -49,7 +49,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+        <Link href="/studio" className="flex items-center gap-2.5 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-sky-400 p-0.5 shadow-lg group-hover:scale-105 transition-all">
             <div className="flex h-full w-full items-center justify-center rounded-[10px] bg-slate-950">
               <Sparkles className="h-4 w-4 text-indigo-400" />
@@ -65,7 +65,7 @@ export function Navbar() {
               </span>
             </div>
             <div className="text-[10px] text-slate-400">
-              Autonomous 24/7 Single-Source Marketing
+              Single-Source Multi-Channel Marketing
             </div>
           </div>
         </Link>
@@ -81,14 +81,14 @@ export function Navbar() {
           <NavLinks />
         </Suspense>
 
-        {/* Cloud Status Pill */}
+        {/* Zero-Key Indicator Pill */}
         <div className="hidden md:flex items-center gap-3">
           <div className="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/40 px-3 py-1 text-xs text-emerald-300">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="font-semibold text-[11px]">24/7 Cloud Daemon Active</span>
+            <span className="font-semibold text-[11px]">Keyless Synthesizer Ready</span>
           </div>
         </div>
       </div>

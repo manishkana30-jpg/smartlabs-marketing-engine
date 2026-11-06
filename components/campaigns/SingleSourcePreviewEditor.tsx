@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Platform } from "@prisma/client";
+import { Platform } from "@/lib/types";
 import {
   Sparkles,
   Send,

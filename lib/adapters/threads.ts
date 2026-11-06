@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { ThreadsContent } from "../ai/types";
 
@@ -74,3 +74,4 @@ export const threadsAdapter: ChannelAdapter<ThreadsContent> = {
     }
   },
 };
+

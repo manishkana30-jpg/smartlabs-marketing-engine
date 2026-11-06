@@ -1,0 +1,39 @@
+export enum Platform {
+  YOUTUBE = "YOUTUBE",
+  WHATSAPP = "WHATSAPP",
+  TELEGRAM = "TELEGRAM",
+  PINTEREST = "PINTEREST",
+  REDDIT = "REDDIT",
+  THREADS = "THREADS",
+  TWITTER = "TWITTER",
+  LINKEDIN = "LINKEDIN",
+  INSTAGRAM = "INSTAGRAM",
+  DEVTO = "DEVTO",
+  DISCORD = "DISCORD",
+}
+
+export enum AiProvider {
+  OPENAI = "OPENAI",
+  GOOGLE_AI = "GOOGLE_AI",
+  ANTHROPIC = "ANTHROPIC",
+}
+
+export enum ConnectionStatus {
+  ACTIVE = "ACTIVE",
+  EXPIRED = "EXPIRED",
+  ERROR = "ERROR",
+}
+
+export enum CampaignStatus {
+  QUEUED = "QUEUED",
+  PROCESSING = "PROCESSING",
+  COMPLETED = "COMPLETED",
+  PARTIALLY_FAILED = "PARTIALLY_FAILED",
+  FAILED = "FAILED",
+}
+
+export enum PublishStatus {
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+  RETRYING = "RETRYING",
+}

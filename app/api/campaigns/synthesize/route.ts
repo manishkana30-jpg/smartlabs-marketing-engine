@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { synthesizeMarketingContent } from "@/lib/ai/synthesizer";
-import { Platform } from "@prisma/client";
-
+import { runUniversalSynthesizer, TonePreset } from "@/lib/synthesizer";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,21 +8,8 @@ export async function POST(req: NextRequest) {
     const {
       seedTopic,
       targetLandingUrl,
-      brandVoice = "authoritative",
-      targetPlatforms = [
-        Platform.YOUTUBE,
-        Platform.WHATSAPP,
-        Platform.TELEGRAM,
-        Platform.PINTEREST,
-        Platform.REDDIT,
-        Platform.THREADS,
-        Platform.TWITTER,
-        Platform.LINKEDIN,
-        Platform.INSTAGRAM,
-        Platform.DEVTO,
-        Platform.DISCORD,
-      ],
-      workspaceId,
+      tone = "growth-hacker",
+      workspaceId = "default-workspace",
     } = body;
 
     if (!seedTopic || !targetLandingUrl) {
@@ -33,27 +19,56 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await synthesizeMarketingContent({
+    // Execute universal synthesizer (keyless by default, upgrades to LLM if keys are present)
+    const result = await runUniversalSynthesizer({
       seedTopic,
       targetLandingUrl,
-      brandVoice,
-      targetPlatforms,
+      tone: tone as TonePreset,
       workspaceId,
     });
+
+    // Optionally record campaign run in SQLite database
+    try {
+      const workspace = await prisma.workspace.upsert({
+        where: { slug: workspaceId },
+        create: {
+          id: workspaceId,
+          name: "Default Workspace",
+          slug: workspaceId,
+          websiteUrl: targetLandingUrl,
+        },
+        update: {},
+      });
+
+      const idempotencyKey = `${workspace.id}:${Date.now()}:${Math.random().toString(36).substring(7)}`;
+
+      await prisma.campaignRun.create({
+        data: {
+          workspaceId: workspace.id,
+          status: "COMPLETED",
+          seedTopic,
+          targetUrl: targetLandingUrl,
+          canonicalPayload: JSON.stringify(result.payload),
+          idempotencyKey,
+        },
+      });
+    } catch (dbErr) {
+      // Non-blocking if database is unseeded
+      console.warn("Notice: SQLite campaign run log skipped:", dbErr);
+    }
 
     return NextResponse.json({
       success: true,
       payload: result.payload,
-      utmUrls: result.utmUrls,
       modelUsed: result.modelUsed,
-      providerUsed: result.providerUsed,
+      isKeyless: result.isKeyless,
     });
   } catch (error: any) {
     console.error("Synthesis error:", error);
     return NextResponse.json(
       {
         success: false,
-        error: error.message || "Failed to synthesize content",
+        error: error.message || "Failed to synthesize marketing content",
       },
       { status: 500 }
     );

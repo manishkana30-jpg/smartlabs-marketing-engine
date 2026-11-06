@@ -90,8 +90,22 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. Execute channel-specific publishing adapter
-    const payload = campaignRun.canonicalPayload as unknown as CanonicalMarketingPayload;
-    const mediaUrls = campaignRun.mediaUrls || [];
+    const payload = (
+      typeof campaignRun.canonicalPayload === "string"
+        ? JSON.parse(campaignRun.canonicalPayload)
+        : campaignRun.canonicalPayload
+    ) as CanonicalMarketingPayload;
+
+    let mediaUrls: string[] = [];
+    if (typeof campaignRun.mediaUrls === "string") {
+      try {
+        mediaUrls = JSON.parse(campaignRun.mediaUrls);
+      } catch {
+        mediaUrls = [];
+      }
+    } else if (Array.isArray(campaignRun.mediaUrls)) {
+      mediaUrls = campaignRun.mediaUrls;
+    }
 
     const result = await dispatchToChannel(channelConnection, payload, mediaUrls);
 

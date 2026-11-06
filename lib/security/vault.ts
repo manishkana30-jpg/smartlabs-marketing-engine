@@ -114,3 +114,4 @@ export function decryptObject<T = Record<string, unknown>>(
 export function generateEncryptionKey(): string {
   return crypto.randomBytes(32).toString("hex");
 }
+

@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { DevtoContent } from "../ai/types";
 
@@ -56,3 +56,4 @@ export const devtoAdapter: ChannelAdapter<DevtoContent> = {
     }
   },
 };
+

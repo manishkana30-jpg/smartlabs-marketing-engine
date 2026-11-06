@@ -2,7 +2,7 @@ import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
-import { Platform, AiProvider } from "@prisma/client";
+import { Platform, AiProvider } from "../types";
 import { prisma } from "../prisma";
 import { decryptSecret } from "../security/vault";
 import { buildChannelUtmMap } from "./utm";
@@ -216,3 +216,4 @@ Only generate content for the requested platforms: ${targetPlatforms.join(", ")}
     providerUsed: provider,
   };
 }
+

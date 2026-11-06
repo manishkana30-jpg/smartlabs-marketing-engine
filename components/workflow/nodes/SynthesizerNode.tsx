@@ -67,3 +67,4 @@ export function SynthesizerNode({ data }: { data: SynthesizerNodeData }) {
     </div>
   );
 }
+

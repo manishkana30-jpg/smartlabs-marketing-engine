@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "../prisma";
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 
 /**
  * Generates a unique, deterministic idempotency key for a campaign run per day.
@@ -48,3 +48,4 @@ export async function isChannelAlreadyDispatched(
 
   return !!existingLog;
 }
+

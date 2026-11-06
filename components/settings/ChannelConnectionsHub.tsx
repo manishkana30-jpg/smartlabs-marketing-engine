@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Platform, AiProvider } from "@prisma/client";
+import { Platform, AiProvider } from "@/lib/types";
 import {
   Key,
   ShieldCheck,

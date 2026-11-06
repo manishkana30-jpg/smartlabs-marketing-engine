@@ -1,6 +1,6 @@
 import React from "react";
 import { Handle, Position } from "@xyflow/react";
-import { Platform } from "@prisma/client";
+import { Platform } from "@/lib/types";
 import {
   MessageSquare,
   Send,

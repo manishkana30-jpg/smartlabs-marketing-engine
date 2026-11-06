@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { YoutubeContent } from "../ai/types";
 
@@ -69,3 +69,4 @@ export const youtubeAdapter: ChannelAdapter<YoutubeContent> = {
     }
   },
 };
+

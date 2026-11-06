@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { TelegramContent } from "../ai/types";
 
@@ -90,3 +90,4 @@ export const telegramAdapter: ChannelAdapter<TelegramContent> = {
     }
   },
 };
+

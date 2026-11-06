@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Platform } from "@prisma/client";
+import { Platform } from "@/lib/types";
 import { synthesizeMarketingContent } from "@/lib/ai/synthesizer";
 import { generateCampaignIdempotencyKey } from "@/lib/queue/idempotency";
 import { enqueueChannelDispatch } from "@/lib/queue/qstash";
@@ -113,12 +113,12 @@ export async function POST(req: NextRequest) {
           status: "PROCESSING",
           seedTopic,
           targetUrl: websiteUrl,
-          canonicalPayload: synthesisResult.payload as any,
+          canonicalPayload: JSON.stringify(synthesisResult.payload),
           idempotencyKey,
         },
         update: {
           status: "PROCESSING",
-          canonicalPayload: synthesisResult.payload as any,
+          canonicalPayload: JSON.stringify(synthesisResult.payload),
         },
       });
 
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
         const job = {
           campaignRunId: campaignRun.id,
           channelConnectionId: connection.id,
-          channel: connection.platform,
+          channel: connection.platform as Platform,
           workspaceId: workspace.id,
         };
 

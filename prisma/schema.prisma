@@ -1,57 +1,10 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-}
-
-enum Plan {
-  FREE
-  PRO
-  ENTERPRISE
-}
-
-enum AiProvider {
-  OPENAI
-  GOOGLE_AI
-  ANTHROPIC
-}
-
-enum Platform {
-  YOUTUBE
-  WHATSAPP
-  TELEGRAM
-  PINTEREST
-  REDDIT
-  THREADS
-  TWITTER
-  LINKEDIN
-  INSTAGRAM
-  DEVTO
-  DISCORD
-}
-
-enum ConnectionStatus {
-  ACTIVE
-  EXPIRED
-  ERROR
-}
-
-enum CampaignStatus {
-  QUEUED
-  PROCESSING
-  COMPLETED
-  PARTIALLY_FAILED
-  FAILED
-}
-
-enum PublishStatus {
-  SUCCESS
-  FAILED
-  RETRYING
 }
 
 model Workspace {
@@ -59,7 +12,7 @@ model Workspace {
   name             String
   slug             String               @unique
   stripeCustomerId String?
-  plan             Plan                 @default(FREE)
+  plan             String               @default("FREE") // FREE, PRO, ENTERPRISE
   websiteUrl       String?
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
@@ -75,7 +28,7 @@ model Workspace {
 model WorkspaceApiKey {
   id           String      @id @default(cuid())
   workspaceId  String
-  provider     AiProvider
+  provider     String      // OPENAI, GOOGLE_AI, ANTHROPIC
   encryptedKey String
   iv           String
   tag          String
@@ -91,15 +44,15 @@ model WorkspaceApiKey {
 model ChannelConnection {
   id                   String           @id @default(cuid())
   workspaceId          String
-  platform             Platform
+  platform             String           // YOUTUBE, WHATSAPP, TELEGRAM, PINTEREST, REDDIT, THREADS, TWITTER, LINKEDIN, INSTAGRAM, DEVTO, DISCORD
   accountName          String
   encryptedAccessToken String
   encryptedRefreshToken String?
   tokenExpiresAt       DateTime?
-  metadata             Json             @default("{}")
+  metadata             String           @default("{}") // JSON string
   iv                   String
   tag                  String
-  status               ConnectionStatus @default(ACTIVE)
+  status               String           @default("ACTIVE") // ACTIVE, EXPIRED, ERROR
   createdAt            DateTime         @default(now())
   updatedAt            DateTime         @updatedAt
 
@@ -113,8 +66,8 @@ model Workflow {
   id             String        @id @default(cuid())
   workspaceId    String
   name           String
-  nodes          Json          // React Flow DAG nodes
-  edges          Json          // React Flow DAG connections
+  nodes          String        // React Flow DAG nodes JSON string
+  edges          String        // React Flow DAG connections JSON string
   cronExpression String        @default("0 8 * * *")
   timezone       String        @default("UTC")
   isActive       Boolean       @default(true)
@@ -131,11 +84,11 @@ model CampaignRun {
   id               String         @id @default(cuid())
   workspaceId      String
   workflowId       String?
-  status           CampaignStatus @default(QUEUED)
+  status           String         @default("QUEUED") // QUEUED, PROCESSING, COMPLETED, PARTIALLY_FAILED, FAILED
   seedTopic        String
   targetUrl        String
-  canonicalPayload Json           // Contains all 11 platform-specific generated variants
-  mediaUrls        String[]       @default([])
+  canonicalPayload String         // JSON containing all generated platform variants
+  mediaUrls        String         @default("[]") // JSON string array
   idempotencyKey   String         @unique // workspaceId:date:hash
   createdAt        DateTime       @default(now())
   completedAt      DateTime?
@@ -151,8 +104,8 @@ model CampaignRun {
 model PublishLog {
   id            String        @id @default(cuid())
   campaignRunId String
-  channel       Platform
-  status        PublishStatus
+  channel       String        // Platform enum string
+  status        String        // SUCCESS, FAILED, RETRYING
   attempts      Int           @default(1)
   externalPostId String?
   externalUrl   String?

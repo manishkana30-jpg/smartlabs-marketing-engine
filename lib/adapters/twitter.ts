@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { TwitterContent } from "../ai/types";
 
@@ -87,3 +87,4 @@ export const twitterAdapter: ChannelAdapter<TwitterContent> = {
     }
   },
 };
+

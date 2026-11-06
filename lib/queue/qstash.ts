@@ -1,5 +1,5 @@
 import { Client, Receiver } from "@upstash/qstash";
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 
 export interface ChannelDispatchJob {
   campaignRunId: string;
@@ -98,3 +98,4 @@ export async function verifyQStashSignature(
     return false;
   }
 }
+

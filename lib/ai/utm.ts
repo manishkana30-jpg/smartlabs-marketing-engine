@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 
 export interface UtmParams {
   source: string;
@@ -96,3 +96,4 @@ export function buildChannelUtmMap(
   }
   return result;
 }
+

@@ -52,3 +52,4 @@ export function TriggerNode({ data }: { data: TriggerNodeData }) {
     </div>
   );
 }
+

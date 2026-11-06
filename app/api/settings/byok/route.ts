@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { encryptSecret } from "@/lib/security/vault";
-import { AiProvider } from "@prisma/client";
+import { AiProvider } from "@/lib/types";
 
 
 export async function POST(req: NextRequest) {

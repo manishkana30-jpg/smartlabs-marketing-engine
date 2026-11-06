@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { WhatsappContent } from "../ai/types";
 
@@ -111,3 +111,4 @@ export const whatsappAdapter: ChannelAdapter<WhatsappContent> = {
     }
   },
 };
+

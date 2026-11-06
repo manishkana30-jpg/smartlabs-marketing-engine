@@ -1,4 +1,5 @@
-import { Platform, ChannelConnection } from "@prisma/client";
+import { ChannelConnection } from "@prisma/client";
+import { Platform } from "../types";
 import { decryptSecret } from "../security/vault";
 import { CanonicalMarketingPayload } from "../ai/types";
 import { DecryptedConnection, PublishResult } from "./types";
@@ -143,3 +144,4 @@ export async function dispatchToChannel(
       };
   }
 }
+

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { encryptSecret } from "@/lib/security/vault";
-import { Platform, ConnectionStatus } from "@prisma/client";
+import { Platform, ConnectionStatus } from "@/lib/types";
 
 
 export async function GET(req: NextRequest) {

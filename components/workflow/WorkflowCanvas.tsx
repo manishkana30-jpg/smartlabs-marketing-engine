@@ -12,10 +12,21 @@ import {
   Connection,
   Edge,
   Node,
-  MarkerType,
 } from "@xyflow/react";
-import { Platform } from "@prisma/client";
-import { Play, Save, CheckCircle2, RotateCcw, Sparkles } from "lucide-react";
+import { Platform } from "@/lib/types";
+import {
+  Play,
+  Save,
+  CheckCircle2,
+  RotateCcw,
+  Sparkles,
+  X,
+  Clock,
+  Shield,
+  Layers,
+  ArrowRight,
+  Zap,
+} from "lucide-react";
 import { TriggerNode } from "./nodes/TriggerNode";
 import { SeedNode } from "./nodes/SeedNode";
 import { SynthesizerNode } from "./nodes/SynthesizerNode";
@@ -37,6 +48,7 @@ const initialNodes: Node[] = [
       type: "cron",
       cronExpression: "0 8 * * *",
       timezone: "UTC",
+      label: "Daily Cron Trigger (08:00 AM UTC)",
     },
   },
   {
@@ -45,7 +57,7 @@ const initialNodes: Node[] = [
     position: { x: 340, y: 350 },
     data: {
       sourceType: "url",
-      topic: "SmartLabs Autonomous 24/7 Engine v2.0 Release",
+      topic: "SmartLabs Autonomous Content Engine v2.5",
       targetLandingUrl: "https://smartlabs.ai/engine",
     },
   },
@@ -54,13 +66,13 @@ const initialNodes: Node[] = [
     type: "synthesizer",
     position: { x: 680, y: 330 },
     data: {
-      model: "gemini-2.0-flash",
-      provider: "GOOGLE_AI",
-      brandVoice: "authoritative",
+      model: "Built-In Keyless / Gemini 2.0 Flash",
+      provider: "SMARTLABS_INTERNAL",
+      brandVoice: "Growth Hacker",
       utmEnabled: true,
     },
   },
-  // Fan-out Channels
+  // Branching Channel Nodes
   {
     id: "ch-youtube",
     type: "channel",
@@ -71,7 +83,7 @@ const initialNodes: Node[] = [
     id: "ch-whatsapp",
     type: "channel",
     position: { x: 1060, y: 120 },
-    data: { platform: Platform.WHATSAPP, accountName: "smartlabs-channel", isEnabled: true, status: "READY" },
+    data: { platform: Platform.WHATSAPP, accountName: "Growth Broadcast", isEnabled: true, status: "READY" },
   },
   {
     id: "ch-telegram",
@@ -83,13 +95,13 @@ const initialNodes: Node[] = [
     id: "ch-pinterest",
     type: "channel",
     position: { x: 1060, y: 280 },
-    data: { platform: Platform.PINTEREST, accountName: "SmartLabsMarketing", isEnabled: true, status: "READY" },
+    data: { platform: Platform.PINTEREST, accountName: "SmartLabsPins", isEnabled: true, status: "READY" },
   },
   {
     id: "ch-reddit",
     type: "channel",
     position: { x: 1060, y: 360 },
-    data: { platform: Platform.REDDIT, accountName: "u/SmartLabsEngine", isEnabled: true, status: "READY" },
+    data: { platform: Platform.REDDIT, accountName: "u/SmartLabsFounder", isEnabled: true, status: "READY" },
   },
   {
     id: "ch-threads",
@@ -107,7 +119,7 @@ const initialNodes: Node[] = [
     id: "ch-linkedin",
     type: "channel",
     position: { x: 1060, y: 600 },
-    data: { platform: Platform.LINKEDIN, accountName: "smartlabs-technologies", isEnabled: true, status: "READY" },
+    data: { platform: Platform.LINKEDIN, accountName: "smartlabs-tech", isEnabled: true, status: "READY" },
   },
   {
     id: "ch-instagram",
@@ -125,7 +137,7 @@ const initialNodes: Node[] = [
     id: "ch-discord",
     type: "channel",
     position: { x: 1060, y: 840 },
-    data: { platform: Platform.DISCORD, accountName: "Announcements Hook", isEnabled: true, status: "READY" },
+    data: { platform: Platform.DISCORD, accountName: "Announcements Webhook", isEnabled: true, status: "READY" },
   },
 ];
 
@@ -144,7 +156,7 @@ const initialEdges: Edge[] = [
     animated: true,
     style: { stroke: "#38bdf8", strokeWidth: 2 },
   },
-  // Synthesizer to Channels
+  // Fan-out to all channels
   { id: "e-synth-yt", source: "synth-1", target: "ch-youtube", animated: true },
   { id: "e-synth-wa", source: "synth-1", target: "ch-whatsapp", animated: true },
   { id: "e-synth-tg", source: "synth-1", target: "ch-telegram", animated: true },
@@ -165,17 +177,23 @@ export function WorkflowCanvas() {
   const [simulationComplete, setSimulationComplete] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
+  // Slide-Over Inspector State
+  const [selectedNode, setSelectedNode] = useState<Node | null>(initialNodes[0]);
+
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
   );
 
-  // Trigger interactive dispatch simulation
+  const handleNodeClick = (_: React.MouseEvent, node: Node) => {
+    setSelectedNode(node);
+  };
+
   const handleTestDispatch = () => {
     setIsSimulating(true);
     setSimulationComplete(false);
 
-    // Apply glowing pulsing class to all edges
+    // Apply glowing pulsing lines to all connectors
     setEdges((prev) =>
       prev.map((edge) => ({
         ...edge,
@@ -183,7 +201,6 @@ export function WorkflowCanvas() {
       }))
     );
 
-    // Simulate synthesis and sequential channel completion
     setTimeout(() => {
       setNodes((prev) =>
         prev.map((node) => {
@@ -202,7 +219,6 @@ export function WorkflowCanvas() {
       setIsSimulating(false);
       setSimulationComplete(true);
 
-      // Reset pulsing after 4 seconds
       setTimeout(() => {
         setEdges((prev) =>
           prev.map((edge) => ({
@@ -211,7 +227,7 @@ export function WorkflowCanvas() {
           }))
         );
       }, 4000);
-    }, 2500);
+    }, 2200);
   };
 
   const handleReset = () => {
@@ -224,25 +240,28 @@ export function WorkflowCanvas() {
   const handleSave = () => {
     setSaveStatus("Saving workflow...");
     setTimeout(() => {
-      setSaveStatus("Saved to Cloud Database ✓");
+      setSaveStatus("Saved to Local SQLite ✓");
       setTimeout(() => setSaveStatus(null), 3000);
-    }, 800);
+    }, 600);
   };
 
   return (
     <div className="relative h-[820px] w-full rounded-2xl border border-slate-800 bg-[#080c14] overflow-hidden shadow-2xl">
       {/* Canvas Top Action Bar */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800/80 bg-slate-900/80 p-3 backdrop-blur-md">
+      <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-800/80 bg-slate-900/90 p-3 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 shadow-md">
             <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-100">
+            <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
               Autonomous Growth Engine DAG
+              <span className="rounded bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-mono text-indigo-300">
+                n8n/Make Style
+              </span>
             </h2>
             <p className="text-xs text-slate-400">
-              Visual pipeline: 24/7 Cloud Cron → Changelog Seed → Gemini Synthesizer → 11 Channels
+              Click any node to open the Slide-Over Inspector. Click Run to pulse connectors.
             </p>
           </div>
         </div>
@@ -281,7 +300,7 @@ export function WorkflowCanvas() {
             {isSimulating ? (
               <>
                 <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                Synthesizing & Dispatching...
+                Executing Pipeline...
               </>
             ) : simulationComplete ? (
               <>
@@ -291,7 +310,7 @@ export function WorkflowCanvas() {
             ) : (
               <>
                 <Play className="h-3.5 w-3.5 fill-current" />
-                Simulate Cloud Dispatch
+                Run Workflow
               </>
             )}
           </button>
@@ -305,6 +324,7 @@ export function WorkflowCanvas() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
@@ -323,6 +343,73 @@ export function WorkflowCanvas() {
           className="!bg-slate-950/90 !border-slate-800"
         />
       </ReactFlow>
+
+      {/* Slide-Over Node Inspector */}
+      {selectedNode && (
+        <div className="absolute top-20 right-4 bottom-4 w-80 rounded-2xl border border-slate-800 bg-slate-900/95 p-5 shadow-2xl backdrop-blur-xl z-20 flex flex-col justify-between overflow-y-auto">
+          <div className="space-y-4">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase tracking-wider text-indigo-400">
+                  Node Inspector
+                </span>
+                <h3 className="text-sm font-bold text-white capitalize">
+                  {selectedNode.type} Node
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelectedNode(null)}
+                className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Run Status Pill */}
+            <div className="rounded-xl bg-slate-950/80 p-3 border border-slate-800/80 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400">Run Status:</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-400 border border-emerald-500/20">
+                  <CheckCircle2 className="h-3 w-3" /> Ready / Active
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>Last Execution:</span>
+                <span className="text-slate-200 font-mono text-[11px]">Today at 08:00 UTC</span>
+              </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>Execution Latency:</span>
+                <span className="text-slate-200 font-mono text-[11px]">42ms</span>
+              </div>
+            </div>
+
+            {/* Retry Policy */}
+            <div className="rounded-xl bg-slate-950/80 p-3 border border-slate-800/80 space-y-1.5 text-xs">
+              <div className="font-semibold text-slate-200 flex items-center gap-1.5">
+                <Shield className="h-3.5 w-3.5 text-indigo-400" /> Retry Policy
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Upstash QStash 3x exponential backoff (10s, 30s, 90s). Dead-letter queue enabled.
+              </p>
+            </div>
+
+            {/* Node Properties */}
+            <div className="space-y-2 text-xs">
+              <div className="font-semibold text-slate-300">Node Properties</div>
+              <pre className="rounded-lg bg-slate-950 p-2.5 font-mono text-[10px] text-slate-300 overflow-x-auto border border-slate-800">
+                {JSON.stringify(selectedNode.data, null, 2)}
+              </pre>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 text-center">
+            <span className="text-[10px] text-slate-500">
+              SmartLabs Marketing Engine • Node ID: {selectedNode.id}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

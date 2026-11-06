@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { LinkedinContent } from "../ai/types";
 
@@ -79,3 +79,4 @@ export const linkedinAdapter: ChannelAdapter<LinkedinContent> = {
     }
   },
 };
+

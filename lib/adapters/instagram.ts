@@ -1,4 +1,4 @@
-import { Platform } from "@prisma/client";
+import { Platform } from "../types";
 import { ChannelAdapter, DecryptedConnection, PublishResult } from "./types";
 import { InstagramContent } from "../ai/types";
 
@@ -106,3 +106,4 @@ export const instagramAdapter: ChannelAdapter<InstagramContent> = {
     }
   },
 };
+
