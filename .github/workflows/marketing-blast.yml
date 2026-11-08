@@ -1,0 +1,32 @@
+name: Autonomous Marketing Blast on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  syndicate:
+    name: Syndicate Release across 11 Platforms
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger SmartLabs Marketing Engine
+        run: |
+          echo "Broadcasting GitHub release '${{ github.event.release.name }}' across all 11 marketing networks..."
+          curl -X POST "${{ secrets.SMARTLABS_ENGINE_URL || 'http://localhost:3000' }}/api/webhooks/github" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: release" \
+            -d '{
+              "action": "published",
+              "repository": {
+                "name": "${{ github.event.repository.name }}",
+                "full_name": "${{ github.repository }}",
+                "html_url": "${{ github.event.repository.html_url }}"
+              },
+              "release": {
+                "id": "${{ github.event.release.id }}",
+                "name": "${{ github.event.release.name }}",
+                "tag_name": "${{ github.event.release.tag_name }}",
+                "body": "${{ github.event.release.body }}",
+                "html_url": "${{ github.event.release.html_url }}"
+              }
+            }' || true
