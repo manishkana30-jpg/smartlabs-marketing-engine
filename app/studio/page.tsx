@@ -64,6 +64,43 @@ export default function MarketingStudioPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedChannel, setCopiedChannel] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [importNotice, setImportNotice] = useState<string | null>(null);
+
+  const handleImportFromUrl = async () => {
+    if (!importUrl) return;
+    setIsImporting(true);
+    setImportNotice(null);
+    try {
+      const res = await fetch("/api/seed/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: importUrl }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setSeedTopic(data.data.summary);
+        setTargetLandingUrl(data.data.url);
+        setImportNotice(`Imported content from ${data.data.title} ✓`);
+        setTimeout(() => setImportNotice(null), 3500);
+
+        // Auto-synthesize for immediate preview
+        const generated = synthesizeKeylessMarketingContent({
+          seedTopic: data.data.summary,
+          targetLandingUrl: data.data.url,
+          tone,
+        });
+        setPayload(generated);
+      } else {
+        setImportNotice("Could not fetch page metadata, try typing a topic.");
+      }
+    } catch {
+      setImportNotice("Failed to import URL.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
   const [synthesizerBadge, setSynthesizerBadge] = useState<string>(
     "Built-In Keyless Synthesizer (Instant, Zero API Key Required)"
   );
@@ -194,6 +231,47 @@ export default function MarketingStudioPage() {
 
       {/* Input Section & One-Click Sample Templates */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 shadow-xl backdrop-blur-md space-y-4">
+        {/* Link Your Own Website Bar */}
+        <div className="rounded-xl border border-sky-500/30 bg-sky-950/30 p-3.5 space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span className="text-xs font-bold text-sky-200 flex items-center gap-1.5">
+              <ExternalLink className="h-4 w-4 text-sky-400" />
+              Link Any Website, Blog Post, or Changelog for Automated Marketing:
+            </span>
+            {importNotice && (
+              <span className="text-xs font-semibold text-emerald-400 animate-pulse">
+                {importNotice}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="url"
+              placeholder="Paste any link (e.g. https://yourwebsite.com/blog/my-post or https://mysite.com)"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              className="flex-1 rounded-lg border border-slate-700 bg-slate-950 px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono"
+            />
+            <button
+              onClick={handleImportFromUrl}
+              disabled={isImporting || !importUrl}
+              className="rounded-lg bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 disabled:text-slate-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-md transition-all flex items-center gap-1.5 whitespace-nowrap"
+            >
+              {isImporting ? (
+                <>
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Extracting...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Auto-Import Content
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
         {/* Templates Row */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-1">
