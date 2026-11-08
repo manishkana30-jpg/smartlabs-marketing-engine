@@ -18,6 +18,7 @@ import {
   Globe,
   Webhook,
   Code2,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   YoutubeIcon,
@@ -41,6 +42,8 @@ interface ChannelConfigItem {
   tokenPlaceholder: string;
   setupUrl: string;
   setupButtonLabel: string;
+  appDeepLink?: string;
+  appDeepLinkLabel?: string;
   setupInstructions: string[];
   webhookNotice?: {
     title: string;
@@ -58,12 +61,15 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <TelegramIcon className="h-5 w-5 text-sky-400" />,
     tokenLabel: "Telegram Bot API Token",
     tokenPlaceholder: "7123456789:AAH...",
+    appDeepLink: "tg://resolve?domain=BotFather",
+    appDeepLinkLabel: "Open in Telegram App (@BotFather) 🚀",
     setupUrl: "https://t.me/BotFather",
-    setupButtonLabel: "Open @BotFather in Telegram ↗",
+    setupButtonLabel: "Open @BotFather in Web Browser ↗",
     setupInstructions: [
-      "Click above to open @BotFather in Telegram and send the command '/newbot'.",
+      "Click above to open @BotFather (in Telegram app or web browser).",
+      "Type or send the command '/newbot'.",
       "Give your bot a name and username, then copy the generated HTTP API Bot Token.",
-      "In Telegram, open or create your Channel, go to Channel Settings → Administrators, and add your bot as an Admin with 'Post Messages' permission.",
+      "In Telegram, open your Channel, go to Channel Settings → Administrators, and add your new bot as an Admin with 'Post Messages' permission.",
       "Enter the Bot Token and your Channel username (e.g. @dailytithi_alerts) below.",
     ],
     metadataFields: [
@@ -77,8 +83,10 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <DiscordIconCustom className="h-5 w-5 text-indigo-400" />,
     tokenLabel: "Discord Webhook URL",
     tokenPlaceholder: "https://discord.com/api/webhooks/...",
+    appDeepLink: "discord://",
+    appDeepLinkLabel: "Open Discord Desktop App 🚀",
     setupUrl: "https://discord.com/channels/@me",
-    setupButtonLabel: "Open Discord in Browser ↗",
+    setupButtonLabel: "Open Discord in Web Browser ↗",
     setupInstructions: [
       "Open your Discord Server and right-click your announcement channel → 'Edit Channel'.",
       "Select 'Integrations' → 'Webhooks' → click 'New Webhook'.",
@@ -94,7 +102,7 @@ const CHANNELS: ChannelConfigItem[] = [
     tokenLabel: "Dev.to API Key",
     tokenPlaceholder: "api_key_...",
     setupUrl: "https://dev.to/settings/extensions",
-    setupButtonLabel: "Open Dev.to API Settings ↗",
+    setupButtonLabel: "Open Dev.to API Key Settings ↗",
     setupInstructions: [
       "Open Dev.to Account Settings → Extensions tab.",
       "Scroll down to 'DEV Community API Keys', enter a description (e.g. 'SmartLabs'), and click 'Generate API Key'.",
@@ -108,6 +116,8 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <WhatsAppIcon className="h-5 w-5 text-emerald-400" />,
     tokenLabel: "WhatsApp Cloud API Permanent Token",
     tokenPlaceholder: "EAA...",
+    appDeepLink: "https://web.whatsapp.com",
+    appDeepLinkLabel: "Open WhatsApp Web / Channels 🚀",
     setupUrl: "https://developers.facebook.com/apps/",
     setupButtonLabel: "Open Meta Developer Portal ↗",
     setupInstructions: [
@@ -133,8 +143,10 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <YoutubeIcon className="h-5 w-5 text-red-500" />,
     tokenLabel: "Google OAuth Access Token",
     tokenPlaceholder: "ya29.a0AfH6SM...",
+    appDeepLink: "https://studio.youtube.com",
+    appDeepLinkLabel: "Open YouTube Studio 🚀",
     setupUrl: "https://console.cloud.google.com/apis/credentials",
-    setupButtonLabel: "Open Google Cloud Console ↗",
+    setupButtonLabel: "Open Google Cloud Credentials ↗",
     setupInstructions: [
       "Open Google Cloud Console and enable the 'YouTube Data API v3'.",
       "Create an OAuth 2.0 Client ID or generate a scoped User Access Token.",
@@ -150,6 +162,8 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <PinterestIcon className="h-5 w-5 text-rose-500" />,
     tokenLabel: "Pinterest Access Token",
     tokenPlaceholder: "pina_...",
+    appDeepLink: "https://www.pinterest.com",
+    appDeepLinkLabel: "Open Pinterest 🚀",
     setupUrl: "https://developers.pinterest.com/apps/",
     setupButtonLabel: "Open Pinterest Developers ↗",
     setupInstructions: [
@@ -184,8 +198,10 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <ThreadsIcon className="h-5 w-5 text-pink-400" />,
     tokenLabel: "Threads User Access Token",
     tokenPlaceholder: "THQW...",
+    appDeepLink: "https://www.threads.net",
+    appDeepLinkLabel: "Open Threads Web 🚀",
     setupUrl: "https://developers.facebook.com/docs/threads",
-    setupButtonLabel: "Open Threads API Portal ↗",
+    setupButtonLabel: "Open Meta Threads API ↗",
     setupInstructions: [
       "Set up the Threads API in your Meta Developer dashboard.",
       "Generate a User Access Token with 'threads_basic' and 'threads_content_publish' scopes.",
@@ -199,6 +215,8 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <TwitterIcon className="h-5 w-5 text-slate-200" />,
     tokenLabel: "Twitter OAuth 2.0 User Token",
     tokenPlaceholder: "AAGv...",
+    appDeepLink: "https://x.com/settings/apps_and_sessions",
+    appDeepLinkLabel: "Open X App Settings 🚀",
     setupUrl: "https://developer.x.com/en/portal/dashboard",
     setupButtonLabel: "Open X Developer Portal ↗",
     setupInstructions: [
@@ -214,6 +232,8 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <LinkedinIcon className="h-5 w-5 text-blue-400" />,
     tokenLabel: "LinkedIn Member/Organization Access Token",
     tokenPlaceholder: "AQV...",
+    appDeepLink: "https://www.linkedin.com/company/setup/new/",
+    appDeepLinkLabel: "Open LinkedIn Company Pages 🚀",
     setupUrl: "https://www.linkedin.com/developers/apps",
     setupButtonLabel: "Open LinkedIn Developer Portal ↗",
     setupInstructions: [
@@ -230,8 +250,10 @@ const CHANNELS: ChannelConfigItem[] = [
     icon: <InstagramIcon className="h-5 w-5 text-fuchsia-400" />,
     tokenLabel: "Facebook Graph User Access Token",
     tokenPlaceholder: "EAAB...",
+    appDeepLink: "https://www.instagram.com",
+    appDeepLinkLabel: "Open Instagram 🚀",
     setupUrl: "https://developers.facebook.com/apps/",
-    setupButtonLabel: "Open Instagram Graph API ↗",
+    setupButtonLabel: "Open Meta Instagram API ↗",
     setupInstructions: [
       "In Meta Developers, add 'Instagram Graph API' to your app.",
       "Ensure your Instagram Professional/Business account is linked to your Facebook Page.",
@@ -273,6 +295,24 @@ export function ChannelConnectionsHub() {
     navigator.clipboard.writeText(text);
     setCopiedKey(keyName);
     setTimeout(() => setCopiedKey(null), 2500);
+  };
+
+  /**
+   * Directly opens the external app / portal in a new tab AND opens the configuration modal
+   */
+  const handleOpenAndConfigure = (ch: ChannelConfigItem) => {
+    const targetUrl = ch.appDeepLink || ch.setupUrl;
+    try {
+      window.open(targetUrl, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      console.warn("Could not open window directly:", e);
+    }
+
+    setActiveChannelModal(ch);
+    setAccountName("");
+    setTokenInput("");
+    setMetadataInputs({});
+    setChannelStatus(null);
   };
 
   const handleTestTithiWebhook = async () => {
@@ -384,23 +424,33 @@ export function ChannelConnectionsHub() {
             </div>
           </div>
 
-          <button
-            onClick={handleTestTithiWebhook}
-            disabled={isTestingWebhook}
-            className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/25 transition-all transform active:scale-95 cursor-pointer shrink-0"
-          >
-            {isTestingWebhook ? (
-              <>
-                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                Testing Webhook...
-              </>
-            ) : (
-              <>
-                <Send className="h-3.5 w-3.5" />
-                Send Live Test Ping
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://dailytithi.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 px-3.5 py-2.5 text-xs font-semibold text-slate-200 transition-all cursor-pointer"
+            >
+              Open dailytithi.com ↗
+            </a>
+            <button
+              onClick={handleTestTithiWebhook}
+              disabled={isTestingWebhook}
+              className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-indigo-600/25 transition-all transform active:scale-95 cursor-pointer shrink-0"
+            >
+              {isTestingWebhook ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                  Testing Webhook...
+                </>
+              ) : (
+                <>
+                  <Send className="h-3.5 w-3.5" />
+                  Send Live Test Ping
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {webhookTestResult && (
@@ -533,7 +583,7 @@ export function ChannelConnectionsHub() {
                 Channel Distribution Matrix (11 Active Traffic Networks)
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Click <strong>"Configure & Link"</strong> to open that platform's developer portal in one click and connect your authorized tokens.
+                Click <strong>"Open App & Configure ↗"</strong> to launch that platform directly in a new tab and link your credentials.
               </p>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1 rounded-full">
@@ -570,26 +620,21 @@ export function ChannelConnectionsHub() {
 
               <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
                 <a
-                  href={ch.setupUrl}
+                  href={ch.appDeepLink || ch.setupUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-indigo-300 transition-all"
-                  title="Open developer portal in new tab"
+                  title="Direct link to platform app or portal"
                 >
-                  Setup ↗
+                  Direct Link ↗
                 </a>
 
                 <button
-                  onClick={() => {
-                    setActiveChannelModal(ch);
-                    setAccountName("");
-                    setTokenInput("");
-                    setMetadataInputs({});
-                    setChannelStatus(null);
-                  }}
-                  className="rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 hover:text-white border border-indigo-500/40 px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer"
+                  onClick={() => handleOpenAndConfigure(ch)}
+                  className="rounded-lg bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 hover:text-white border border-indigo-500/50 px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer flex items-center gap-1"
                 >
-                  Configure & Link
+                  <span>Open & Configure</span>
+                  <ArrowUpRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -744,23 +789,42 @@ export function ChannelConnectionsHub() {
 
             {/* Step 1: Direct Link to Platform Setup Page */}
             <div className="space-y-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 block">
                 Step 1: Open Developer / Configuration Page
               </span>
-              <a
-                href={activeChannelModal.setupUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between w-full rounded-xl bg-gradient-to-r from-indigo-600/30 via-purple-600/30 to-sky-600/30 border border-indigo-500/50 hover:border-indigo-400 p-3.5 text-xs font-bold text-white shadow-lg transition-all group"
-              >
-                <span className="flex items-center gap-2">
-                  <ExternalLink className="h-4 w-4 text-indigo-400 group-hover:scale-110 transition-transform" />
-                  {activeChannelModal.setupButtonLabel}
-                </span>
-                <span className="text-[11px] text-indigo-300 underline font-normal">
-                  Click to open in new tab →
-                </span>
-              </a>
+              <div className="grid grid-cols-1 gap-2">
+                {activeChannelModal.appDeepLink && (
+                  <a
+                    href={activeChannelModal.appDeepLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between w-full rounded-xl bg-gradient-to-r from-emerald-600/30 via-teal-600/30 to-sky-600/30 border border-emerald-500/50 hover:border-emerald-400 p-3.5 text-xs font-bold text-emerald-100 shadow-lg transition-all group cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ExternalLink className="h-4 w-4 text-emerald-400 group-hover:scale-110 transition-transform" />
+                      {activeChannelModal.appDeepLinkLabel}
+                    </span>
+                    <span className="text-[11px] text-emerald-300 underline font-normal">
+                      Launch app directly →
+                    </span>
+                  </a>
+                )}
+
+                <a
+                  href={activeChannelModal.setupUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between w-full rounded-xl bg-gradient-to-r from-indigo-600/30 via-purple-600/30 to-sky-600/30 border border-indigo-500/50 hover:border-indigo-400 p-3.5 text-xs font-bold text-white shadow-lg transition-all group cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    {activeChannelModal.setupButtonLabel}
+                  </span>
+                  <span className="text-[11px] text-indigo-300 underline font-normal">
+                    Open in new tab →
+                  </span>
+                </a>
+              </div>
             </div>
 
             {/* Step 2: Clear Instructions */}
