@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Platform } from "@/lib/types";
 import {
   Sparkles,
@@ -73,6 +73,8 @@ export default function MarketingStudioPage() {
   const [importUrl, setImportUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [importNotice, setImportNotice] = useState<string | null>(null);
+  const [generateSuccessMsg, setGenerateSuccessMsg] = useState<string | null>(null);
+  const previewSectionRef = useRef<HTMLDivElement>(null);
 
   const handleImportFromUrl = async () => {
     if (!importUrl) return;
@@ -131,10 +133,15 @@ export default function MarketingStudioPage() {
       tone: tmpl.tone,
     });
     setPayload(generated);
+    setGenerateSuccessMsg(`✨ Loaded "${tmpl.name}" & generated 11 channel outputs below!`);
+    setTimeout(() => {
+      previewSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
   };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
+    setGenerateSuccessMsg(null);
     try {
       const res = await fetch("/api/campaigns/synthesize", {
         method: "POST",
@@ -154,14 +161,15 @@ export default function MarketingStudioPage() {
             ? "Built-In Keyless Synthesizer (Zero Paid API Key Required)"
             : `AI SDK Active: ${data.modelUsed}`
         );
+        setGenerateSuccessMsg("✨ All 11 Platforms Synthesized! See preview below.");
       } else {
-        // Fallback locally
         const fallback = synthesizeKeylessMarketingContent({
           seedTopic,
           targetLandingUrl,
           tone,
         });
         setPayload(fallback);
+        setGenerateSuccessMsg("✨ 11 Platforms Generated with Keyless Synthesizer! See preview below.");
       }
     } catch {
       const fallback = synthesizeKeylessMarketingContent({
@@ -170,8 +178,12 @@ export default function MarketingStudioPage() {
         tone,
       });
       setPayload(fallback);
+      setGenerateSuccessMsg("✨ 11 Platforms Generated! See preview below.");
     } finally {
       setIsGenerating(false);
+      setTimeout(() => {
+        previewSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     }
   };
 
@@ -344,10 +356,57 @@ export default function MarketingStudioPage() {
             </div>
           </div>
         </div>
+
+        {/* Bottom Action Bar inside Input Card */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+            <span className="font-medium text-slate-300">
+              Ready to generate for YouTube, WhatsApp, Telegram, X, Instagram, LinkedIn, Reddit, Dev.to, Pinterest, Threads, Discord
+            </span>
+          </div>
+
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-sky-500 hover:from-indigo-600 hover:to-sky-600 px-6 py-3 text-sm font-bold text-white shadow-xl shadow-indigo-500/25 transition-all transform active:scale-95 cursor-pointer"
+          >
+            {isGenerating ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Synthesizing All 11 Platforms...
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 fill-current" />
+                Generate All 11 Platforms Now →
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
+      {/* Success Notification Banner */}
+      {generateSuccessMsg && (
+        <div className="rounded-xl border border-emerald-500/40 bg-emerald-950/60 p-4 text-xs font-semibold text-emerald-300 flex items-center justify-between shadow-xl shadow-emerald-500/10">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
+            <span>{generateSuccessMsg}</span>
+          </div>
+          <button
+            onClick={() => previewSectionRef.current?.scrollIntoView({ behavior: "smooth" })}
+            className="underline text-emerald-200 hover:text-white shrink-0 ml-4 cursor-pointer"
+          >
+            View Previews Below ↓
+          </button>
+        </div>
+      )}
+
       {/* Multi-Channel Live Previews & Inline Editor */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-2xl overflow-hidden backdrop-blur-md">
+      <div
+        ref={previewSectionRef}
+        className="rounded-2xl border border-slate-800 bg-slate-900/90 shadow-2xl overflow-hidden backdrop-blur-md scroll-mt-6"
+      >
         {/* Navigation Tabs */}
         <div className="flex overflow-x-auto border-b border-slate-800 bg-slate-950/60 p-2 gap-1.5">
           {[
