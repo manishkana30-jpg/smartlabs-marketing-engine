@@ -54,6 +54,12 @@ const SAMPLE_TEMPLATES = [
     url: "https://smartlabs.ai/growth-guide",
     tone: "growth-hacker" as TonePreset,
   },
+  {
+    name: "Daily Tithi Alert (dailytithi.com)",
+    seed: "Daily Tithi Alert: Today is Shukla Paksha Dashami. Sunrise at 06:40 AM, Sunset at 05:32 PM. Auspicious day for spiritual practices, gratitude, and mindful action. Check today's complete Panchang & Muhurat.",
+    url: "https://dailytithi.com",
+    tone: "storyteller" as TonePreset,
+  },
 ];
 
 export default function MarketingStudioPage() {

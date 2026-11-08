@@ -30,3 +30,4 @@ jobs:
                 "html_url": "${{ github.event.release.html_url }}"
               }
             }' || true
+
