@@ -299,7 +299,6 @@ export function ChannelConnectionsHub() {
           sunrise: "06:40 AM",
           sunset: "05:32 PM",
           nakshatra: "Rohini",
-          specialSignificance: "Auspicious day for spiritual practices, morning prayers, and temple visits.",
           panchak: "No Active Panchak",
           shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
           rahuKaal: "04:30 PM - 06:00 PM",
