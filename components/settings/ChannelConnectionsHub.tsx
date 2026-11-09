@@ -298,7 +298,12 @@ export function ChannelConnectionsHub() {
           date: new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }),
           sunrise: "06:40 AM",
           sunset: "05:32 PM",
-          specialSignificance: "Auspicious day for spiritual beginnings, meditation, and temple visits.",
+          nakshatra: "Rohini",
+          specialSignificance: "Auspicious day for spiritual practices, morning prayers, and temple visits.",
+          panchak: "No Active Panchak",
+          shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
+          rahuKaal: "04:30 PM - 06:00 PM",
+          auspiciousFor: "Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:",
           landingUrl: "https://dailytithi.com",
         }),
       });

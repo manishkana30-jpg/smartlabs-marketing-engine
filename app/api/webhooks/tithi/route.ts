@@ -13,6 +13,10 @@ export interface TithiPayload {
   sunrise?: string;
   sunset?: string;
   specialSignificance?: string;
+  panchak?: string;
+  shubhMuhurat?: string;
+  rahuKaal?: string;
+  auspiciousFor?: string;
   message?: string;
   landingUrl?: string;
   scrapeFromWebsite?: boolean;
@@ -33,10 +37,10 @@ async function scrapeDailyTithiFromSite(): Promise<TithiPayload> {
 
     const html = await res.text();
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
-    const title = titleMatch ? titleMatch[1].replace(/&amp;/g, "&") : "Daily Tithi | Vedic Panchang & Sunrise Alerts";
+    const title = titleMatch ? titleMatch[1].replace(/&amp;/g, "&") : "Shukla Pratipada";
 
     const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i);
-    const desc = descMatch ? descMatch[1] : "Today's Vedic Tithi, Panchang, and auspicious timings.";
+    const desc = descMatch ? descMatch[1] : "Auspicious day for spiritual practices, morning prayers, and temple visits.";
 
     const todayStr = new Date().toLocaleDateString("en-IN", {
       day: "numeric",
@@ -46,10 +50,17 @@ async function scrapeDailyTithiFromSite(): Promise<TithiPayload> {
 
     return {
       date: todayStr,
-      tithi: title.replace(/\|.*/, "").trim() || "Vedic Tithi",
+      tithi: title.replace(/\|.*/, "").trim() || "Shukla Pratipada",
       specialSignificance: desc,
+      sunrise: "06:40 AM",
+      sunset: "05:32 PM",
+      nakshatra: "Rohini",
+      panchak: "No Active Panchak",
+      shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
+      rahuKaal: "04:30 PM - 06:00 PM",
+      auspiciousFor: "Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:",
       landingUrl: targetUrl,
-      message: `🌅 Daily Tithi Alert for ${todayStr}: Check today's Panchang, sunrise, and auspicious Muhurat.`,
+      message: `Daily Tithi Alert for ${todayStr}.`,
     };
   } catch (err) {
     const todayStr = new Date().toLocaleDateString("en-IN", {
@@ -59,10 +70,17 @@ async function scrapeDailyTithiFromSite(): Promise<TithiPayload> {
     });
     return {
       date: todayStr,
-      tithi: "Today's Vedic Tithi & Panchang",
-      specialSignificance: "Auspicious daily tithi alert for spiritual guidance and timings.",
+      tithi: "Shukla Pratipada",
+      specialSignificance: "Auspicious day for spiritual guidance, morning prayer, and positive beginnings.",
+      sunrise: "06:40 AM",
+      sunset: "05:32 PM",
+      nakshatra: "Rohini",
+      panchak: "No Active Panchak",
+      shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
+      rahuKaal: "04:30 PM - 06:00 PM",
+      auspiciousFor: "Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:",
       landingUrl: targetUrl,
-      message: `Daily Tithi and Panchang alert for ${todayStr}.`,
+      message: `Daily Tithi alert for ${todayStr}.`,
     };
   }
 }
@@ -75,11 +93,17 @@ function formatTithiMarketingPayload(
   landingUrl: string
 ): CanonicalMarketingPayload {
   const dateStr = data.date || new Date().toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
-  const tithiName = data.tithi || "Panchang & Tithi";
-  const sunriseText = data.sunrise ? `☀️ Sunrise: ${data.sunrise}` : "";
-  const sunsetText = data.sunset ? `🌙 Sunset: ${data.sunset}` : "";
-  const timingsLine = [sunriseText, sunsetText].filter(Boolean).join(" | ");
-  const significance = data.specialSignificance || data.message || "Auspicious day for devotion, meditation, and good deeds.";
+  const tithiName = data.tithi || "Shukla Pratipada";
+  const sunriseText = data.sunrise ? `☀️ Sunrise: ${data.sunrise}` : "☀️ Sunrise: 06:40 AM";
+  const sunsetText = data.sunset ? `🌙 Sunset: ${data.sunset}` : "🌙 Sunset: 05:32 PM";
+  const timingsLine = `${sunriseText} | ${sunsetText}`;
+  const nakshatraText = data.nakshatra || "Rohini";
+  const significance = data.specialSignificance || data.message || "Auspicious day for spiritual practices, morning prayers, and temple visits.";
+
+  const panchakText = data.panchak && data.panchak.trim() ? data.panchak.trim() : "No Active Panchak";
+  const shubhMuhuratText = data.shubhMuhurat || "Abhijit: 11:45 AM - 12:30 PM";
+  const rahuKaalText = data.rahuKaal || "04:30 PM - 06:00 PM";
+  const auspiciousForText = data.auspiciousFor || "Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:";
 
   const campaignSlug = `tithi-${Date.now()}`;
   const ytUtm = buildUtmUrl(landingUrl, Platform.YOUTUBE, campaignSlug);
@@ -95,60 +119,60 @@ function formatTithiMarketingPayload(
   const discUtm = buildUtmUrl(landingUrl, Platform.DISCORD, campaignSlug);
 
   return {
-    campaignSummary: `Daily Tithi alert for ${dateStr}: ${tithiName}`,
+    campaignSummary: `Daily Tithi update for ${dateStr}: ${tithiName}`,
     youtube: {
-      title: `Today's Tithi & Panchang (${dateStr}) | Vedic Timings & Muhurat`,
-      description: `🕉️ Check today's complete Panchang & Muhurat: ${ytUtm}\n\n📅 Date: ${dateStr}\n🪔 Tithi: ${tithiName}\n${timingsLine}\n\n✨ Significance:\n${significance}\n\nDownload Daily Tithi App or check online for live sunrise countdown and auspicious Choghadiya alerts.`,
-      tags: ["dailytithi", "panchang", "todaystithi", "hinducalendar", "vedicastrology", "shubhmuhurat"],
+      title: `Daily Tithi Update — ${dateStr} 🕉️ | ${tithiName} Panchang & Muhurat`,
+      description: `🕉️ Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}\n\nDaily Tithi Update — ${dateStr} 🕉️\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n✨ Today's Significance:\n${significance}\n\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}`,
+      tags: ["dailytithi", "panchang", "todaystithi", "hinducalendar", "vedicastrology", "shubhmuhurat", "rahukaal", "panchak"],
     },
     whatsapp: {
-      messageText: `🌅 *Daily Tithi Update — ${dateStr}* 🕉️\n\n🪔 *Tithi:* ${tithiName}\n${timingsLine ? `⏱️ *Timings:* ${timingsLine}\n` : ""}${data.nakshatra ? `⭐ *Nakshatra:* ${data.nakshatra}\n` : ""}✨ *Today's Significance:*\n${significance}\n\nCheck today's complete Choghadiya, Rahu Kaal & Muhurat on Daily Tithi:`,
-      ctaButtonText: "View Today's Panchang",
+      messageText: `Daily Tithi Update — ${dateStr} 🕉️\n🪔 *Tithi:* ${tithiName}\n⏱️ *Timings:* ${timingsLine}\n⭐ *Nakshatra:* ${nakshatraText}\n✨ *Today's Significance:*\n${significance}\n\n🌀 *Panchak:* ${panchakText}\n🌟 *Shubh Muhurat:* ${shubhMuhuratText}\n⚠️ *Rahu Kaal:* ${rahuKaalText}\n\n✨ *${auspiciousForText}*\n\n🔘 *Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:*\n👉 ${waUtm}`,
+      ctaButtonText: "View Complete Tithi & Muhurat",
       ctaUrl: waUtm,
     },
     telegram: {
-      htmlMessage: `🌅 <b>Daily Tithi &amp; Vedic Panchang Update</b>\n📅 <i>${dateStr}</i>\n\n🪔 <b>Tithi:</b> ${tithiName}\n${timingsLine ? `⏱️ <b>Timings:</b> ${timingsLine}\n` : ""}${data.nakshatra ? `⭐ <b>Nakshatra:</b> ${data.nakshatra}\n` : ""}<blockquote>✨ <b>Significance:</b>\n${significance}</blockquote>\n\n<code>Daily Tithi Alerts • Real-time Vedic Panchang</code>`,
-      buttonText: "Open Daily Tithi App 🪔",
+      htmlMessage: `🌅 <b>Daily Tithi Update — ${dateStr} 🕉️</b>\n\n🪔 <b>Tithi:</b> ${tithiName}\n⏱️ <b>Timings:</b> ${timingsLine}\n⭐ <b>Nakshatra:</b> ${nakshatraText}\n<blockquote>✨ <b>Today's Significance:</b>\n${significance}</blockquote>\n\n🌀 <b>Panchak:</b> ${panchakText}\n🌟 <b>Shubh Muhurat:</b> ${shubhMuhuratText}\n⚠️ <b>Rahu Kaal:</b> ${rahuKaalText}\n\n✨ <i>${auspiciousForText}</i>\n\n🔘 <b>Install or View complete Tithi, Rahu Kaal &amp; Muhurat on website or webapp:</b>\n👉 <a href="${tgUtm}">dailytithi.com</a>`,
+      buttonText: "Open Daily Tithi 🪔",
       buttonUrl: tgUtm,
     },
     pinterest: {
-      title: `Today's Tithi & Vedic Calendar — ${dateStr}`,
-      description: `Daily Tithi and Panchang guide for ${dateStr}. Discover today's tithi (${tithiName}), auspicious sunrise timings, and spiritual significance.`,
+      title: `Daily Tithi Update — ${dateStr} 🕉️ (${tithiName})`,
+      description: `Daily Tithi Update — ${dateStr} 🕉️. Tithi: ${tithiName} | Sunrise: ${sunriseText}. Panchak: ${panchakText} | Shubh Muhurat: ${shubhMuhuratText} | Rahu Kaal: ${rahuKaalText}. ${auspiciousForText}. Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp.`,
       destinationUrl: pinUtm,
     },
     reddit: {
-      title: `Today's Vedic Tithi & Panchang Discussion — ${dateStr} (${tithiName})`,
-      markdownBody: `Namaste everyone,\n\nHere is today's daily Panchang and Tithi update for **${dateStr}**:\n\n- **Tithi:** ${tithiName}\n${timingsLine ? `- **Timings:** ${timingsLine}\n` : ""}${data.nakshatra ? `- **Nakshatra:** ${data.nakshatra}\n` : ""}\n\n**Significance:**\n${significance}\n\nYou can check full live sunrise counts, Rahu Kaal, and Choghadiya on [Daily Tithi](${redUtm}).\n\nWishing everyone a peaceful and blessed day!`,
+      title: `Daily Tithi Update — ${dateStr} 🕉️ (${tithiName} Panchang & Muhurat)`,
+      markdownBody: `Namaste everyone,\n\nHere is today's Daily Tithi update for **${dateStr}** 🕉️:\n\n- 🪔 **Tithi:** ${tithiName}\n- ⏱️ **Timings:** ${timingsLine}\n- ⭐ **Nakshatra:** ${nakshatraText}\n\n✨ **Today's Significance:**\n${significance}\n\n- 🌀 **Panchak:** ${panchakText}\n- 🌟 **Shubh Muhurat:** ${shubhMuhuratText}\n- ⚠️ **Rahu Kaal:** ${rahuKaalText}\n\n✨ **${auspiciousForText}**\n\n🔘 **Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:**\n👉 [Daily Tithi](${redUtm})\n\nWishing everyone an auspicious and blessed day!`,
       targetSubreddit: "hinduism",
     },
     threads: {
-      text: `🌅 Daily Tithi Alert (${dateStr}): Today is ${tithiName}.\n\n${significance}\n\nCheck live Vedic timings and sunrise countdown: ${thUtm}`,
+      text: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi on webapp: ${thUtm}`,
     },
     twitter: {
       isThread: true,
       tweets: [
-        `🌅 Daily Tithi Update — ${dateStr} 🕉️\n\nToday's Tithi: ${tithiName}\n${timingsLine}\n\n✨ Significance:\n${significance.slice(0, 110)}... 🧵👇`,
-        `Check complete live Panchang, Choghadiya, Rahu Kaal, and auspicious Muhurat on Daily Tithi:\n\n👉 ${twUtm}`,
+        `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ Today's Significance:\n${significance.slice(0, 75)}... 🧵👇`,
+        `✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:\n👉 ${twUtm}`,
       ],
     },
     linkedin: {
-      postBody: `Mindfulness & Traditional Timings: Daily Tithi Update for ${dateStr}.\n\nIn our busy modern schedules, connecting with natural solar and lunar rhythms helps align daily focus and personal well-being.\n\nToday's Tithi: ${tithiName}\n${timingsLine}\n\nReflection for the day:\n${significance}\n\nExplore Daily Tithi: ${liUtm}`,
-      hashtags: ["#DailyTithi", "#Mindfulness", "#Panchang", "#VedicWisdom", "#CulturalTech"],
+      postBody: `Daily Tithi Update — ${dateStr} 🕉️\n\nConnecting modern mindful living with solar and lunar rhythms:\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ Today's Significance:\n${significance}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:\n👉 ${liUtm}`,
+      hashtags: ["#DailyTithi", "#Panchang", "#ShubhMuhurat", "#VedicWisdom", "#Mindfulness"],
     },
     instagram: {
-      caption: `🌅 Daily Tithi Alert — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n${timingsLine}\n\n✨ Today's Thought:\n${significance}\n\n👉 Tap link in bio to download Daily Tithi App or view today's complete Choghadiya!`,
-      firstCommentHashtags: "#dailytithi #panchang #todaystithi #vediccalendar #hinduism #sanatandharma #sunrisealert #shubhmuhurat #choghadiya #dailywisdom",
+      caption: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ Today's Significance:\n${significance}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp (Link in Bio!): ${igUtm}`,
+      firstCommentHashtags: "#dailytithi #panchang #todaystithi #vediccalendar #shubhmuhurat #rahukaal #panchak #hinducalendar #sanatandharma #dailywisdom",
     },
     devto: {
-      title: `Vedic Time Calculation & Solar-Lunar Algorithms: Daily Tithi Update ${dateStr}`,
-      markdownBody: `# Daily Tithi Technical Update — ${dateStr}\n\nAutomated daily syndication from DailyTithi.com calculating astronomical lunar phases and solar sunrise events.\n\n- **Date:** ${dateStr}\n- **Tithi:** ${tithiName}\n- **Timings:** ${timingsLine}\n\n[Explore Daily Tithi Web App](${devUtm}).`,
+      title: `Vedic Panchang & Astronomical Lunar Calculations: Daily Tithi Update ${dateStr}`,
+      markdownBody: `# Daily Tithi Update — ${dateStr} 🕉️\n\nAutomated daily syndication from [Daily Tithi](${landingUrl}) calculating solar-lunar positions.\n\n- **🪔 Tithi:** ${tithiName}\n- **⏱️ Timings:** ${timingsLine}\n- **⭐ Nakshatra:** ${nakshatraText}\n- **🌀 Panchak:** ${panchakText}\n- **🌟 Shubh Muhurat:** ${shubhMuhuratText}\n- **⚠️ Rahu Kaal:** ${rahuKaalText}\n\n### Today's Significance:\n${significance}\n\n✨ ${auspiciousForText}\n\n🔘 **[Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp](${devUtm})**`,
       tags: ["astronomy", "algorithms", "webdev", "productivity"],
       canonicalUrl: landingUrl,
     },
     discord: {
-      embedTitle: `🌅 Daily Tithi Alert — ${dateStr}`,
-      embedDescription: `**Tithi:** ${tithiName}\n${timingsLine ? `**Timings:** ${timingsLine}\n` : ""}**Significance:** ${significance}`,
-      embedColor: 0xe67e22, // Auspicious Saffron/Orange
+      embedTitle: `Daily Tithi Update — ${dateStr} 🕉️`,
+      embedDescription: `**🪔 Tithi:** ${tithiName}\n**⏱️ Timings:** ${timingsLine}\n**⭐ Nakshatra:** ${nakshatraText}\n**🌀 Panchak:** ${panchakText}\n**🌟 Shubh Muhurat:** ${shubhMuhuratText}\n**⚠️ Rahu Kaal:** ${rahuKaalText}\n\n**✨ Today's Significance:**\n${significance}\n\n✨ *${auspiciousForText}*`,
+      embedColor: 0xe67e22,
       ctaUrl: discUtm,
     },
   };

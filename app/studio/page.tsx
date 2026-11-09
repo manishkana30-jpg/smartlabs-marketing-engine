@@ -56,7 +56,7 @@ const SAMPLE_TEMPLATES = [
   },
   {
     name: "Daily Tithi Alert (dailytithi.com)",
-    seed: "Daily Tithi Alert: Today is Shukla Paksha Dashami. Sunrise at 06:40 AM, Sunset at 05:32 PM. Auspicious day for spiritual practices, gratitude, and mindful action. Check today's complete Panchang & Muhurat.",
+    seed: "Daily Tithi Update — 9 November 2026 🕉️\n🪔 Tithi: Shukla Pratipada\n⏱️ Timings: ☀️ Sunrise: 06:40 AM | 🌙 Sunset: 05:32 PM\n⭐ Nakshatra: Rohini\n✨ Today's Significance: Auspicious day for spiritual beginnings, morning prayer, and temple visits.\n🌀 Panchak: No Active Panchak\n🌟 Shubh Muhurat: Abhijit: 11:45 AM - 12:30 PM\n⚠️ Rahu Kaal: 04:30 PM - 06:00 PM\n✨ Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: dailytithi.com",
     url: "https://dailytithi.com",
     tone: "storyteller" as TonePreset,
   },
