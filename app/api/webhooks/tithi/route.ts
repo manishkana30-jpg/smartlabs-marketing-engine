@@ -12,6 +12,7 @@ export interface TithiPayload {
   nakshatra?: string;
   sunrise?: string;
   sunset?: string;
+  specialOccasion?: string;
   specialSignificance?: string;
   panchak?: string;
   shubhMuhurat?: string;
@@ -55,6 +56,7 @@ async function scrapeDailyTithiFromSite(): Promise<TithiPayload> {
       sunrise: "06:40 AM",
       sunset: "05:32 PM",
       nakshatra: "Rohini",
+      specialOccasion: "Chandra Darshan",
       panchak: "No Active Panchak",
       shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
       rahuKaal: "04:30 PM - 06:00 PM",
@@ -75,6 +77,7 @@ async function scrapeDailyTithiFromSite(): Promise<TithiPayload> {
       sunrise: "06:40 AM",
       sunset: "05:32 PM",
       nakshatra: "Rohini",
+      specialOccasion: "Chandra Darshan",
       panchak: "No Active Panchak",
       shubhMuhurat: "Abhijit: 11:45 AM - 12:30 PM",
       rahuKaal: "04:30 PM - 06:00 PM",
@@ -98,19 +101,29 @@ function formatTithiMarketingPayload(
   const sunsetText = data.sunset ? `🌙 Sunset: ${data.sunset}` : "🌙 Sunset: 05:32 PM";
   const timingsLine = `${sunriseText} | ${sunsetText}`;
   const nakshatraText = data.nakshatra || "Rohini";
-  const significance = (data.specialSignificance || data.message || "").trim();
+
+  // Special Occasion handling (supports specialOccasion, festival, occasion, or specialOccassion)
+  const rawOccasion = (
+    data.specialOccasion ||
+    (data as any).specialOccassion ||
+    (data as any).festival ||
+    (data as any).occasion ||
+    ""
+  ).trim();
+  const occasionText = rawOccasion;
 
   const panchakText = data.panchak && data.panchak.trim() ? data.panchak.trim() : "No Active Panchak";
   const shubhMuhuratText = data.shubhMuhurat || "Abhijit: 11:45 AM - 12:30 PM";
   const rahuKaalText = data.rahuKaal || "04:30 PM - 06:00 PM";
   const auspiciousForText = data.auspiciousFor || "Auspicious day for Yatra, Home Buying, Vehicle Buying complete calendar on Daily Tithi:";
 
-  // Optional significance block: only renders if provided
-  const waSignificanceBlock = significance ? `✨ *Today's Significance:*\n${significance}\n\n` : "";
-  const tgSignificanceBlock = significance ? `<blockquote>✨ <b>Today's Significance:</b>\n${significance}</blockquote>\n\n` : "";
-  const ytSignificanceBlock = significance ? `✨ Today's Significance:\n${significance}\n\n` : "";
-  const redditSignificanceBlock = significance ? `\n✨ **Today's Significance:**\n${significance}\n` : "";
-  const discordSignificance = significance ? `\n\n**✨ Today's Significance:**\n${significance}` : "";
+  // Platform specific blocks for Special Occasion
+  const waOccasionBlock = occasionText ? `🎉 *Special Occasion:* ${occasionText}\n` : "";
+  const tgOccasionBlock = occasionText ? `🎉 <b>Special Occasion:</b> ${occasionText}\n` : "";
+  const ytOccasionBlock = occasionText ? `🎉 Special Occasion: ${occasionText}\n` : "";
+  const redditOccasionBlock = occasionText ? `- 🎉 **Special Occasion:** ${occasionText}\n` : "";
+  const discordOccasionBlock = occasionText ? `\n**🎉 Special Occasion:** ${occasionText}` : "";
+  const socialOccasionBlock = occasionText ? `🎉 Special Occasion: ${occasionText}\n` : "";
 
   const campaignSlug = `tithi-${Date.now()}`;
   const ytUtm = buildUtmUrl(landingUrl, Platform.YOUTUBE, campaignSlug);
@@ -128,57 +141,57 @@ function formatTithiMarketingPayload(
   return {
     campaignSummary: `Daily Tithi update for ${dateStr}: ${tithiName}`,
     youtube: {
-      title: `Daily Tithi Update — ${dateStr} 🕉️ | ${tithiName} Panchang & Muhurat`,
-      description: `🕉️ Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}\n\nDaily Tithi Update — ${dateStr} 🕉️\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n\n${ytSignificanceBlock}🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}`,
-      tags: ["dailytithi", "panchang", "todaystithi", "hinducalendar", "vedicastrology", "shubhmuhurat", "rahukaal", "panchak"],
+      title: `Daily Tithi Update — ${dateStr} 🕉️ | ${tithiName} ${occasionText ? `(${occasionText}) ` : ""}Panchang & Muhurat`,
+      description: `🕉️ Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}\n\nDaily Tithi Update — ${dateStr} 🕉️\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n${ytOccasionBlock}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp: ${ytUtm}`,
+      tags: ["dailytithi", "panchang", "todaystithi", "hinducalendar", "vedicastrology", "shubhmuhurat", "rahukaal", "panchak", "specialoccasion"],
     },
     whatsapp: {
-      messageText: `Daily Tithi Update — ${dateStr} 🕉️\n🪔 *Tithi:* ${tithiName}\n⏱️ *Timings:* ${timingsLine}\n⭐ *Nakshatra:* ${nakshatraText}\n\n${waSignificanceBlock}🌀 *Panchak:* ${panchakText}\n🌟 *Shubh Muhurat:* ${shubhMuhuratText}\n⚠️ *Rahu Kaal:* ${rahuKaalText}\n\n✨ *${auspiciousForText}*\n\n🔘 *Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:*\n👉 ${waUtm}`,
+      messageText: `Daily Tithi Update — ${dateStr} 🕉️\n🪔 *Tithi:* ${tithiName}\n⏱️ *Timings:* ${timingsLine}\n⭐ *Nakshatra:* ${nakshatraText}\n${waOccasionBlock}\n🌀 *Panchak:* ${panchakText}\n🌟 *Shubh Muhurat:* ${shubhMuhuratText}\n⚠️ *Rahu Kaal:* ${rahuKaalText}\n\n✨ *${auspiciousForText}*\n\n🔘 *Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:*\n👉 ${waUtm}`,
       ctaButtonText: "View Complete Tithi & Muhurat",
       ctaUrl: waUtm,
     },
     telegram: {
-      htmlMessage: `🌅 <b>Daily Tithi Update — ${dateStr} 🕉️</b>\n\n🪔 <b>Tithi:</b> ${tithiName}\n⏱️ <b>Timings:</b> ${timingsLine}\n⭐ <b>Nakshatra:</b> ${nakshatraText}\n\n${tgSignificanceBlock}🌀 <b>Panchak:</b> ${panchakText}\n🌟 <b>Shubh Muhurat:</b> ${shubhMuhuratText}\n⚠️ <b>Rahu Kaal:</b> ${rahuKaalText}\n\n✨ <i>${auspiciousForText}</i>\n\n🔘 <b>Install or View complete Tithi, Rahu Kaal &amp; Muhurat on website or webapp:</b>\n👉 <a href="${tgUtm}">dailytithi.com</a>`,
+      htmlMessage: `🌅 <b>Daily Tithi Update — ${dateStr} 🕉️</b>\n\n🪔 <b>Tithi:</b> ${tithiName}\n⏱️ <b>Timings:</b> ${timingsLine}\n⭐ <b>Nakshatra:</b> ${nakshatraText}\n${tgOccasionBlock}\n🌀 <b>Panchak:</b> ${panchakText}\n🌟 <b>Shubh Muhurat:</b> ${shubhMuhuratText}\n⚠️ <b>Rahu Kaal:</b> ${rahuKaalText}\n\n✨ <i>${auspiciousForText}</i>\n\n🔘 <b>Install or View complete Tithi, Rahu Kaal &amp; Muhurat on website or webapp:</b>\n👉 <a href="${tgUtm}">dailytithi.com</a>`,
       buttonText: "Open Daily Tithi 🪔",
       buttonUrl: tgUtm,
     },
     pinterest: {
       title: `Daily Tithi Update — ${dateStr} 🕉️ (${tithiName})`,
-      description: `Daily Tithi Update — ${dateStr} 🕉️. Tithi: ${tithiName} | Sunrise: ${sunriseText}. Panchak: ${panchakText} | Shubh Muhurat: ${shubhMuhuratText} | Rahu Kaal: ${rahuKaalText}. ${auspiciousForText}. Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp.`,
+      description: `Daily Tithi Update — ${dateStr} 🕉️. Tithi: ${tithiName} | Sunrise: ${sunriseText}. ${occasionText ? `Special Occasion: ${occasionText}. ` : ""}Panchak: ${panchakText} | Shubh Muhurat: ${shubhMuhuratText} | Rahu Kaal: ${rahuKaalText}. ${auspiciousForText}. Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp.`,
       destinationUrl: pinUtm,
     },
     reddit: {
       title: `Daily Tithi Update — ${dateStr} 🕉️ (${tithiName} Panchang & Muhurat)`,
-      markdownBody: `Namaste everyone,\n\nHere is today's Daily Tithi update for **${dateStr}** 🕉️:\n\n- 🪔 **Tithi:** ${tithiName}\n- ⏱️ **Timings:** ${timingsLine}\n- ⭐ **Nakshatra:** ${nakshatraText}${redditSignificanceBlock}\n- 🌀 **Panchak:** ${panchakText}\n- 🌟 **Shubh Muhurat:** ${shubhMuhuratText}\n- ⚠️ **Rahu Kaal:** ${rahuKaalText}\n\n✨ **${auspiciousForText}**\n\n🔘 **Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:**\n👉 [Daily Tithi](${redUtm})\n\nWishing everyone an auspicious and blessed day!`,
+      markdownBody: `Namaste everyone,\n\nHere is today's Daily Tithi update for **${dateStr}** 🕉️:\n\n- 🪔 **Tithi:** ${tithiName}\n- ⏱️ **Timings:** ${timingsLine}\n- ⭐ **Nakshatra:** ${nakshatraText}\n${redditOccasionBlock}- 🌀 **Panchak:** ${panchakText}\n- 🌟 **Shubh Muhurat:** ${shubhMuhuratText}\n- ⚠️ **Rahu Kaal:** ${rahuKaalText}\n\n✨ **${auspiciousForText}**\n\n🔘 **Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:**\n👉 [Daily Tithi](${redUtm})\n\nWishing everyone an auspicious and blessed day!`,
       targetSubreddit: "hinduism",
     },
     threads: {
-      text: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi on webapp: ${thUtm}`,
+      text: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n${socialOccasionBlock}🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi on webapp: ${thUtm}`,
     },
     twitter: {
       isThread: true,
       tweets: [
-        `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n${significance ? `✨ Significance: ${significance.slice(0, 70)}... ` : ""}🧵👇`,
+        `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n${socialOccasionBlock}🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText} 🧵👇`,
         `✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:\n👉 ${twUtm}`,
       ],
     },
     linkedin: {
-      postBody: `Daily Tithi Update — ${dateStr} 🕉️\n\nConnecting modern mindful living with solar and lunar rhythms:\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}${significance ? `\n\n✨ Today's Significance:\n${significance}` : ""}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:\n👉 ${liUtm}`,
-      hashtags: ["#DailyTithi", "#Panchang", "#ShubhMuhurat", "#VedicWisdom", "#Mindfulness"],
+      postBody: `Daily Tithi Update — ${dateStr} 🕉️\n\nConnecting modern mindful living with solar and lunar rhythms:\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n${socialOccasionBlock}🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp:\n👉 ${liUtm}`,
+      hashtags: ["#DailyTithi", "#Panchang", "#ShubhMuhurat", "#SpecialOccasion", "#VedicWisdom", "#Mindfulness"],
     },
     instagram: {
-      caption: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}${significance ? `\n\n✨ Today's Significance:\n${significance}` : ""}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp (Link in Bio!): ${igUtm}`,
-      firstCommentHashtags: "#dailytithi #panchang #todaystithi #vediccalendar #shubhmuhurat #rahukaal #panchak #hinducalendar #sanatandharma #dailywisdom",
+      caption: `Daily Tithi Update — ${dateStr} 🕉️\n\n🪔 Tithi: ${tithiName}\n⏱️ Timings: ${timingsLine}\n⭐ Nakshatra: ${nakshatraText}\n${socialOccasionBlock}🌀 Panchak: ${panchakText}\n🌟 Shubh Muhurat: ${shubhMuhuratText}\n⚠️ Rahu Kaal: ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp (Link in Bio!): ${igUtm}`,
+      firstCommentHashtags: "#dailytithi #panchang #todaystithi #specialoccasion #vediccalendar #shubhmuhurat #rahukaal #panchak #hinducalendar #sanatandharma #dailywisdom",
     },
     devto: {
       title: `Vedic Panchang & Astronomical Lunar Calculations: Daily Tithi Update ${dateStr}`,
-      markdownBody: `# Daily Tithi Update — ${dateStr} 🕉️\n\nAutomated daily syndication from [Daily Tithi](${landingUrl}) calculating solar-lunar positions.\n\n- **🪔 Tithi:** ${tithiName}\n- **⏱️ Timings:** ${timingsLine}\n- **⭐ Nakshatra:** ${nakshatraText}\n- **🌀 Panchak:** ${panchakText}\n- **🌟 Shubh Muhurat:** ${shubhMuhuratText}\n- **⚠️ Rahu Kaal:** ${rahuKaalText}${significance ? `\n\n### Today's Significance:\n${significance}` : ""}\n\n✨ ${auspiciousForText}\n\n🔘 **[Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp](${devUtm})**`,
+      markdownBody: `# Daily Tithi Update — ${dateStr} 🕉️\n\nAutomated daily syndication from [Daily Tithi](${landingUrl}) calculating solar-lunar positions.\n\n- **🪔 Tithi:** ${tithiName}\n- **⏱️ Timings:** ${timingsLine}\n- **⭐ Nakshatra:** ${nakshatraText}\n${redditOccasionBlock}- **🌀 Panchak:** ${panchakText}\n- **🌟 Shubh Muhurat:** ${shubhMuhuratText}\n- **⚠️ Rahu Kaal:** ${rahuKaalText}\n\n✨ ${auspiciousForText}\n\n🔘 **[Install or View complete Tithi, Rahu Kaal & Muhurat on website or webapp](${devUtm})**`,
       tags: ["astronomy", "algorithms", "webdev", "productivity"],
       canonicalUrl: landingUrl,
     },
     discord: {
       embedTitle: `Daily Tithi Update — ${dateStr} 🕉️`,
-      embedDescription: `**🪔 Tithi:** ${tithiName}\n**⏱️ Timings:** ${timingsLine}\n**⭐ Nakshatra:** ${nakshatraText}\n**🌀 Panchak:** ${panchakText}\n**🌟 Shubh Muhurat:** ${shubhMuhuratText}\n**⚠️ Rahu Kaal:** ${rahuKaalText}${discordSignificance}\n\n✨ *${auspiciousForText}*`,
+      embedDescription: `**🪔 Tithi:** ${tithiName}\n**⏱️ Timings:** ${timingsLine}\n**⭐ Nakshatra:** ${nakshatraText}${discordOccasionBlock}\n**🌀 Panchak:** ${panchakText}\n**🌟 Shubh Muhurat:** ${shubhMuhuratText}\n**⚠️ Rahu Kaal:** ${rahuKaalText}\n\n✨ *${auspiciousForText}*`,
       embedColor: 0xe67e22,
       ctaUrl: discUtm,
     },
